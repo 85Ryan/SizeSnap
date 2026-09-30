@@ -76,6 +76,18 @@ test('restore changes only the requested window; undo returns its original geome
   await f.send('undo'); assert.deepEqual(boundsOf(f.wins[7]), boundsOf(original));
   assert.equal((await f.send('snapshot')).canUndo, false);
 });
+test('a stored window notice is shown once and dismissal does not affect undo', async () => {
+  const f = fixture();
+  await f.send('apply-custom', { bounds: preset });
+  const passive = await f.send('snapshot', { consumeNotice: false });
+  assert.equal(passive.notice, '');
+  const firstOpen = await f.send('snapshot');
+  assert.match(firstOpen.notice, /已应用自定义尺寸与位置/);
+  assert.equal(firstOpen.canUndo, true);
+  const nextOpen = await f.send('snapshot');
+  assert.equal(nextOpen.notice, '');
+  assert.equal(nextOpen.canUndo, true);
+});
 test('exit fullscreen before changing bounds, and restore fullscreen on undo', async () => {
   const f = fixture(); f.wins[7].state = 'fullscreen';
   await f.send('apply-custom', { bounds: preset });

@@ -44,6 +44,16 @@ try {
   await page.getByRole('button', { name: /^编辑 / }).click();
   await page.fill('#preset-name', '日常浏览'); await page.getByRole('button', { name: '保存预设', exact: true }).click(); await ready(page);
   assert.equal(await page.getByRole('button', { name: '恢复 日常浏览', exact: true }).count(), 1); pass('Rename stored preset');
+  await page.evaluate(async () => {
+    const { id } = await chrome.windows.getCurrent();
+    await chrome.storage.session.set({ [`notice:${id}`]: '仅显示一次的提示' });
+  });
+  await page.reload(); await ready(page);
+  assert.equal(await page.locator('#status-text').innerText(), '仅显示一次的提示');
+  await page.click('#dismiss-status');
+  await page.reload(); await ready(page);
+  assert.equal(await page.locator('#status').isVisible(), false);
+  pass('Dismissed notice does not reappear after reopening the popup');
   await page.click('#new-preset');
   const startingGeometry = await geometry(page);
   const sizes = [['16:9', 2560, 1440], ['4:3', 2560, 1920], ['3:2', 2400, 1600], ['16:10', 2560, 1600], ['1:1', 2560, 2560]];

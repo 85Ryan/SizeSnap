@@ -132,11 +132,11 @@ function render() {
   $('undo').disabled = busy || !snapshot.canUndo;
   if (centered && !$('editor').hidden) recenter();
 }
-async function refresh() { snapshot = await send('snapshot'); render(); }
+async function refresh(consumeNotice = true) { snapshot = await send('snapshot', { consumeNotice }); render(); }
 async function passiveRefresh() {
   if (busy || refreshing) return;
   refreshing = true;
-  try { await refresh(); } catch (error) { notify(error.message, true); }
+  try { await refresh(false); } catch (error) { notify(error.message, true); }
   finally { refreshing = false; }
 }
 function fillForm(preset) {

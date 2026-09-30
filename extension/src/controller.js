@@ -64,7 +64,14 @@ export function createController(api, { wait = ms => new Promise(resolve => setT
   async function dispatch(message) {
     const { type, windowId } = message;
     if (type === 'snapshot') {
-      const [data, win, screens, session] = await Promise.all([read(), windowFor(windowId), displays(), api.storage.session.get([undoKey(windowId), noticeKey(windowId)])]);
+      const consumeNotice = message.consumeNotice !== false;
+      const [data, win, screens, session] = await Promise.all([
+        read(), windowFor(windowId), displays(),
+        api.storage.session.get(consumeNotice ? [undoKey(windowId), noticeKey(windowId)] : undoKey(windowId)),
+      ]);
+      if (consumeNotice && Object.hasOwn(session, noticeKey(windowId))) {
+        await api.storage.session.remove(noticeKey(windowId));
+      }
       return { ...data, current: capture(win, screens), canUndo: Boolean(session[undoKey(windowId)]), notice: session[noticeKey(windowId)] || '' };
     }
     if (type === 'save-current') {
