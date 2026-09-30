@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>SizeSnap 快窗</title>
+  <link rel="stylesheet" href="src/popup.css">
+  <script type="module" src="src/popup.js"></script>
+</head>
+<body class="loading">
+  <header class="header">
+    <div class="brand"><img src="icons/mark.svg" width="36" height="36" alt=""><div><h1>快窗</h1><span class="wordmark">SizeSnap</span></div></div>
+    <button class="icon-button" id="help-toggle" aria-label="使用说明" title="使用说明" aria-expanded="false" aria-controls="help"><span class="icon" data-icon="question" aria-hidden="true"></span></button>
+  </header>
+
+  <main id="main-scroll">
+    <div id="home-view" class="view">
+      <section class="current" aria-labelledby="current-label">
+        <div class="section-top"><h2 id="current-label">当前窗口</h2><span id="window-state" class="state">读取中</span></div>
+        <div class="window-info">
+          <p class="dimensions"><span id="current-width" class="skeleton-number">...</span><span class="times">×</span><span id="current-height" class="skeleton-number">...</span><small>px</small></p>
+          <p class="position" id="current-position">正在读取窗口位置</p>
+        </div>
+        <button id="save-current" class="primary full" disabled><span class="icon" data-icon="plus" aria-hidden="true"></span>保存当前窗口</button>
+      </section>
+      <section id="presets-panel" aria-labelledby="presets-title">
+        <div class="section-top presets-heading"><h2 id="presets-title">我的预设 <span id="preset-count" class="count">0</span></h2><button id="new-preset" class="text-button" disabled><span class="icon" data-icon="plus" aria-hidden="true"></span>自定义预设</button></div>
+        <p class="section-hint" id="list-hint">点击预设，恢复尺寸和位置</p>
+        <div id="preset-list" class="preset-list"></div>
+        <div id="empty" class="empty" hidden><span class="icon empty-icon" data-icon="browsers" aria-hidden="true"></span><h3>从一个顺手的窗口开始</h3><p>调好大小和位置，保存下来。<br>下次点一下，就能回来。</p></div>
+      </section>
+    </div>
+
+    <section id="editor" class="view" hidden aria-labelledby="editor-title">
+      <div class="editor-heading"><button type="button" id="cancel-edit" class="icon-button" aria-label="取消编辑" title="返回预设"><span class="icon" data-icon="arrow-left" aria-hidden="true"></span></button><div><h2 id="editor-title">自定义预设</h2><p>选择常用尺寸，或手动输入</p></div><button type="button" id="use-current" class="text-button" title="填入当前窗口的尺寸和坐标">使用当前</button></div>
+      <form id="preset-form">
+        <label class="field name-field" for="preset-name">预设名称<input id="preset-name" name="name" maxlength="40" required placeholder="例如：专注写作" autocomplete="off"></label>
+        <fieldset class="size-section">
+          <legend>窗口尺寸 <span>包含浏览器边框</span></legend>
+          <div id="quick-sizes" class="quick-sizes" role="group" aria-label="常用尺寸"></div>
+          <div class="field-grid">
+            <label class="field" for="preset-width">宽度<span class="input-wrap"><input id="preset-width" type="number" min="200" max="100000" step="1" required><span class="input-unit" aria-hidden="true">px</span></span></label>
+            <label class="field" for="preset-height">高度<span class="input-wrap"><input id="preset-height" type="number" min="120" max="100000" step="1" required><span class="input-unit" aria-hidden="true">px</span></span></label>
+          </div>
+        </fieldset>
+        <fieldset class="position-section">
+          <legend>窗口位置</legend>
+          <button type="button" id="center-window" class="center-button" aria-pressed="false"><span class="icon" data-icon="crosshair-simple" aria-hidden="true"></span><span id="center-label">屏幕居中</span></button>
+          <div class="field-grid">
+            <label class="field" for="preset-left">横坐标 X<input id="preset-left" type="number" min="-100000" max="100000" step="1" required></label>
+            <label class="field" for="preset-top">纵坐标 Y<input id="preset-top" type="number" min="-100000" max="100000" step="1" required></label>
+          </div>
+        </fieldset>
+        <div class="state-field"><label for="preset-state">窗口状态</label><select id="preset-state"><option value="normal">普通窗口</option><option value="maximized">最大化</option><option value="fullscreen">全屏</option></select></div>
+        <p class="hint" id="editor-hint">位置以桌面左上角为原点，副屏可使用负值。</p>
+        <p id="form-error" class="form-error" role="alert" hidden></p>
+      </form>
+    </section>
+  </main>
+
+  <div id="status" role="status" aria-live="polite" hidden><span class="icon" id="status-icon" data-icon="check-circle" aria-hidden="true"></span><span id="status-text"></span><button id="dismiss-status" class="icon-button" aria-label="关闭提示"><span class="icon" data-icon="x" aria-hidden="true"></span></button></div>
+  <footer id="home-footer"><button id="undo" class="text-button" disabled><span class="icon" data-icon="arrow-counter-clockwise" aria-hidden="true"></span>撤销调整</button><div class="backup-actions"><button id="export" class="text-button" disabled><span class="icon" data-icon="export" aria-hidden="true"></span>导出</button><button id="import" class="text-button" disabled><span class="icon" data-icon="download-simple" aria-hidden="true"></span>导入</button></div></footer>
+  <footer id="editor-footer" hidden><button type="button" id="apply-custom" class="secondary" aria-label="仅应用尺寸与位置">仅应用尺寸与位置</button><button class="primary" type="submit" form="preset-form"><span class="icon" data-icon="check" aria-hidden="true"></span>保存预设</button></footer>
+  <input type="file" id="import-file" accept="application/json,.json" hidden>
+
+  <dialog id="help" aria-labelledby="help-title"><div class="section-top"><h2 id="help-title">使用快窗</h2><button id="close-help" class="icon-button" aria-label="关闭使用说明"><span class="icon" data-icon="x" aria-hidden="true"></span></button></div><p>保存当前窗口后，点击预设即可恢复。使用右侧编辑按钮，调整名称、尺寸和位置。</p><p>自定义时可选常用比例。“屏幕居中”按当前窗口所在屏幕计算；开启后，调整尺寸会保持居中，手动修改坐标可退出。</p><p>尺寸包含浏览器边框。外接屏断开或尺寸超出屏幕时，会自动适配到可见区域。</p><p>数据只存本机。卸载前可导出备份。</p><button id="shortcuts" class="secondary full">设置键盘快捷键<span class="icon" data-icon="arrow-up-right" aria-hidden="true"></span></button></dialog>
+  <dialog id="delete-dialog" aria-labelledby="delete-title"><span class="dialog-symbol danger-symbol icon" data-icon="trash" aria-hidden="true"></span><h2 id="delete-title">删除这个预设？</h2><p id="delete-name"></p><div class="dialog-actions"><button id="cancel-delete" class="secondary">取消</button><button id="confirm-delete" class="danger">删除预设</button></div></dialog>
+  <dialog id="discard-dialog" aria-labelledby="discard-title"><h2 id="discard-title">放弃这次修改？</h2><p>未保存的尺寸和位置会被丢弃。</p><div class="dialog-actions"><button id="keep-editing" class="secondary">继续编辑</button><button id="discard-edit" class="danger">放弃修改</button></div></dialog>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# 本地 Chrome 加载目录，由 npm run build 从 extension/ 生成
+dist/
+node_modules/
+test-results/
+.DS_Store
+
+# 仅供此工作区旧安装兼容的本地符号链接
+/manifest.json
+/popup.html
+/src
+/icons

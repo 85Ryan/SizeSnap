@@ -1,0 +1,21 @@
+{
+  "name": "sizesnap",
+  "version": "1.1.2",
+  "private": true,
+  "type": "module",
+  "description": "SizeSnap 快窗：保存并一键恢复 Chrome 窗口尺寸和位置",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node scripts/check.mjs",
+    "test:browser": "npm run build && node tests/browser.mjs",
+    "icons": "node scripts/vendor-icons.mjs && python3 scripts/generate-icons.py && npm run build",
+    "build": "node scripts/build.mjs && node scripts/check.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@phosphor-icons/core": "2.1.1",
+    "playwright": "1.58.2"
+  }
+}

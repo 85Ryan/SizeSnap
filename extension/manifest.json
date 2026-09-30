@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "SizeSnap 快窗",
+  "version": "1.1.2",
+  "description": "记住顺手的窗口布局。保存 Chrome 窗口尺寸和位置，随时一键恢复。",
+  "minimum_chrome_version": "102",
+  "permissions": [
+    "storage",
+    "system.display"
+  ],
+  "action": {
+    "default_title": "SizeSnap 快窗",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "打开快窗"
+    },
+    "save-current": {
+      "description": "保存当前窗口为新预设"
+    },
+    "restore-last": {
+      "description": "恢复最近使用的预设"
+    },
+    "undo-window": {
+      "description": "撤销上一次窗口调整"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
